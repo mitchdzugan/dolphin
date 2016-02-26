@@ -1,27 +1,22 @@
 #pragma once
 
+#include "PlatformDependent.h"
+#include "ExternalActions.h"
 #include "PadsCommon.h"
 #include <vector>
-
-#include <ws2tcpip.h>
-#include <winsock2.h>
-
-class GcnPadManager;
+#include <mutex>
 
 class GcnPadsManager
 {
 public:
 	GcnPadsManager();
 	~GcnPadsManager();
-	std::vector<GcnPadManager *> pads;
-	struct addrinfo * result;
-	std::vector<SOCKET *> clients;
+	void PadManipFunction(GCPadStatus * PadStatus, int controllerID);
+
+	std::vector<ExternalAction *> externalActions;
+	std::vector<TcpClient *> tcpClients;
+	std::mutex mutexExternalActions;
+	std::mutex mutexTcpClients;
 };
 
-typedef struct GcnPadsMan_SOCKET_t {
-	GcnPadsManager * padsManager;
-	SOCKET * client;
-} GcnPadsMan_SOCKET;
-
-void clientAcceptorThread(void* pParams);
-void clientManagerThread(void* pParams);
+void clientManager(GcnPadsManager * padsManager, TcpClient * client);

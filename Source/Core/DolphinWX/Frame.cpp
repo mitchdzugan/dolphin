@@ -58,7 +58,6 @@
 #include "VideoCommon/VertexShaderManager.h"
 #include "VideoCommon/VideoConfig.h"
 
-#include "GcnPadManager.h"
 #include "GcnPadsManager.h"
 
 int g_saveSlot = 1;
@@ -1623,7 +1622,7 @@ void GCPadManagedManipFunction(GCPadStatus * PadStatus, int controllerID)
 {
 	if (main_frame)
 	{
-		main_frame->g_PadsManager->pads[controllerID]->PadManipFunction(PadStatus, controllerID);
+		main_frame->g_PadsManager->PadManipFunction(PadStatus, controllerID);
 	}
 }
 

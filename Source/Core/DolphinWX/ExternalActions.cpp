@@ -7,9 +7,9 @@ AlterPadStatus::AlterPadStatus(GCPadStatus * PadStatusToUse, int frame, int cont
 	this->controllerId = controllerId;
 }
 
-void AlterPadStatus::PerformAction(GCPadStatus * PadStatus, int controllerId)
+void AlterPadStatus::PerformAction(GCPadStatus * PadStatus, int frame, int controllerId)
 {
-	if (this->controllerId == controllerId)
+	if (this->frame == frame && this->controllerId == controllerId)
 	{
 		*PadStatus = *PadStatusToUse;
 	}

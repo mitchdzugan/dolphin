@@ -39,6 +39,11 @@ set(GUI_SRCS
 	NetPlay/PadMapDialog.cpp
 	FifoPlayerDlg.cpp
 	Frame.cpp
+	GcnPadsManager.cpp
+	PadsCommon.cpp
+	jsoncpp.cpp
+	PlatformDependent.cpp
+	ExternalActions.cpp
 	FrameAui.cpp
 	FrameTools.cpp
 	GameListCtrl.cpp
