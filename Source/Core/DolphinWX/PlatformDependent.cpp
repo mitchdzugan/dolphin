@@ -1,6 +1,7 @@
 #include "PlatformDependent.h"
 #include "GcnPadsManager.h"
 #include <thread>
+#define PORT "3490"  // the port users will be connecting to
 
 #ifdef _WIN32
 
@@ -22,11 +23,34 @@
 #pragma comment (lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
-//// init
+class WindowsTcpClient : public TcpClient
+{
+public:
+	WindowsTcpClient(SOCKET socket)
+	{
+		this->socket = socket;
+	};
+
+	int read(char * recvbuf, int recvlen)
+	{
+		return recv(this->socket, recvbuf, recvlen, 0);
+	};
+
+	int write(const char * recvbuf, int recvlen)
+	{
+		return send(this->socket, recvbuf, recvlen, 0);
+	};
+
+private:
+	SOCKET socket;
+};
+
+void LaunchTcpServer(GcnPadsManager * padsManager)
+{
 	WSADATA wsaData;
 	int iResult;
 
-	result = NULL;
+	struct addrinfo * result = NULL;
 	struct addrinfo hints;
 
 	// Initialize Winsock
@@ -43,27 +67,16 @@
 	hints.ai_flags = AI_PASSIVE;
 
 	// Resolve the server address and port
-	iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+	iResult = getaddrinfo(NULL, PORT, &hints, &result);
 	if (iResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", iResult);
 		WSACleanup();
 		return;
 	}
 
-	_beginthread(clientAcceptorThread, 0, this);
-
-
-
-void clientAcceptorThread(void* pParams)
-{
-	int iResult;
-
 	SOCKET ListenSocket = INVALID_SOCKET;
 	SOCKET ClientSocket = INVALID_SOCKET;
 	SOCKET * ClientSocketPtr = NULL;
-
-	GcnPadsManager * padsManager = (GcnPadsManager *)pParams;
-	struct addrinfo * result = padsManager->result;
 
 	// Create a SOCKET for connecting to server
 	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
@@ -89,111 +102,35 @@ void clientAcceptorThread(void* pParams)
 	while (1)
 	{
 		iResult = listen(ListenSocket, SOMAXCONN);
-		/*if (iResult == SOCKET_ERROR) {
-		printf("listen failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		break;
-		}*/
+		if (iResult == SOCKET_ERROR) {
+			printf("listen failed with error: %d\n", WSAGetLastError());
+			closesocket(ListenSocket);
+			WSACleanup();
+			break;
+		}
 
 		// Accept a client socket
 		ClientSocket = accept(ListenSocket, NULL, NULL);
-		/*if (ClientSocket == INVALID_SOCKET) {
-		printf("accept failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		break;
-		}*/
-		ClientSocketPtr = new SOCKET(ClientSocket);
-
-		padsManager->clients.push_back(ClientSocketPtr);
-
-		_beginthread(clientManagerThread, 0, new GcnPadsMan_SOCKET({ padsManager, ClientSocketPtr }));
+		if (ClientSocket == INVALID_SOCKET) {
+			printf("accept failed with error: %d\n", WSAGetLastError());
+			closesocket(ListenSocket);
+			WSACleanup();
+			break;
+		}
+		
+		padsManager->mutexTcpClients.lock();
+		WindowsTcpClient * wtc = new WindowsTcpClient(ClientSocket);
+		padsManager->tcpClients.push_back(wtc);
+		padsManager->mutexTcpClients.unlock();
+		std::thread t(clientManager, padsManager, wtc);
+		t.detach();
 	}
 
 	// No longer need server socket
 	closesocket(ListenSocket);
 }
 
-
-
-
-
-
-void clientManagerThread(void* pParams)
-{
-	GcnPadsMan_SOCKET * temp = (GcnPadsMan_SOCKET *)pParams;
-	GcnPadsManager * padsManager = temp->padsManager;
-	SOCKET ClientSocket = *(temp->client);
-	delete temp;
-	int iResult;
-
-
-	// shutdown the connection since we're done
-	iResult = shutdown(ClientSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(ClientSocket);
-		WSACleanup();
-		return;
-	}
-
-	// cleanup
-	closesocket(ClientSocket);
-	WSACleanup();
-}
-
-void handlePacket(GcnPadsManager * padsManager, char * recvbuf, SOCKET s)
-{
-	GCPadStatus * ps;
-	int semicolonCount = 0;
-	for (int i = 0; i < strlen(recvbuf) && recvbuf[i] != '\n'; i++)
-	{
-		if (recvbuf[i] == ';')
-			semicolonCount++;
-	}
-
-	if (strstr(recvbuf, "CLEAR"))
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			WaitForSingleObject(padsManager->pads[i]->PadQueueMutex, INFINITE);
-			padsManager->pads[i]->PadQueue.clear();
-			ReleaseMutex(padsManager->pads[i]->PadQueueMutex);
-		}
-	}
-	else if (semicolonCount == 10)
-	{
-		ps = new GCPadStatus();
-		padStatusFromPacket(recvbuf, ps);
-		int cid = controllerFromPacket(recvbuf);
-		if (cid < 4)
-		{
-			WaitForSingleObject(padsManager->pads[cid]->PadQueueMutex, INFINITE);
-			padsManager->pads[cid]->PadQueue.push_back(new PadAtFrame(frameFromPacket(recvbuf), ps));
-			ReleaseMutex(padsManager->pads[cid]->PadQueueMutex);
-		}
-	}
-}
-
-typedef struct GcnPadsMan_SOCKET_t {
-	GcnPadsManager * padsManager;
-	SOCKET * client;
-} GcnPadsMan_SOCKET;
-
 #else
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -213,8 +150,6 @@ typedef struct GcnPadsMan_SOCKET_t {
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
-
-#define PORT "3490"  // the port users will be connecting to
 
 #define BACKLOG 10     // how many pending connections queue will hold
 

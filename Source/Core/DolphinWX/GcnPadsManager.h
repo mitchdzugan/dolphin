@@ -2,7 +2,6 @@
 
 #include "PlatformDependent.h"
 #include "ExternalActions.h"
-#include "PadsCommon.h"
 #include <vector>
 #include <mutex>
 

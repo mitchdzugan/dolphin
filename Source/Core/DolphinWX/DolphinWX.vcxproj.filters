@@ -202,13 +202,13 @@
     <ClCompile Include="GcnPadsManager.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="GcnPadManager.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="PadsCommon.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="ExternalActions.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="jsoncpp.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformDependent.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -378,13 +378,16 @@
     <ClInclude Include="GcnPadsManager.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="PadsCommon.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="GcnPadManager.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="ExternalActions.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="json.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="json-forwards.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformDependent.h">
       <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>

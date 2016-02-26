@@ -89,8 +89,8 @@
     <ClCompile Include="Debugger\WatchView.cpp" />
     <ClCompile Include="Debugger\WatchWindow.cpp" />
     <ClCompile Include="ExternalActions.cpp" />
-    <ClCompile Include="GcnPadManager.cpp" />
     <ClCompile Include="GcnPadsManager.cpp" />
+    <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="NetPlay\ChangeGameDialog.cpp" />
     <ClCompile Include="NetPlay\NetPlaySetupFrame.cpp" />
     <ClCompile Include="NetPlay\NetWindow.cpp" />
@@ -111,8 +111,8 @@
     </ClCompile>
     <ClCompile Include="MemcardManager.cpp" />
     <ClCompile Include="NetPlay\PadMapDialog.cpp" />
-    <ClCompile Include="PadsCommon.cpp" />
     <ClCompile Include="PatchAddEdit.cpp" />
+    <ClCompile Include="PlatformDependent.cpp" />
     <ClCompile Include="SoftwareVideoConfigDialog.cpp" />
     <ClCompile Include="TASInputDlg.cpp" />
     <ClCompile Include="VideoConfigDiag.cpp" />
@@ -131,12 +131,13 @@
     <ClInclude Include="Config\PathConfigPane.h" />
     <ClInclude Include="Config\WiiConfigPane.h" />
     <ClInclude Include="ExternalActions.h" />
-    <ClInclude Include="GcnPadManager.h" />
     <ClInclude Include="GcnPadsManager.h" />
+    <ClInclude Include="json-forwards.h" />
+    <ClInclude Include="json.h" />
     <ClInclude Include="NetPlay\ChangeGameDialog.h" />
     <ClInclude Include="NetPlay\NetPlaySetupFrame.h" />
     <ClInclude Include="NetPlay\PadMapDialog.h" />
-    <ClInclude Include="PadsCommon.h" />
+    <ClInclude Include="PlatformDependent.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="AboutDolphin.h" />
     <ClInclude Include="ARCodeAddEdit.h" />
