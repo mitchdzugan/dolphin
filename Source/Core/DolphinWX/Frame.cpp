@@ -58,6 +58,9 @@
 #include "VideoCommon/VertexShaderManager.h"
 #include "VideoCommon/VideoConfig.h"
 
+#include "GcnPadManager.h"
+#include "GcnPadsManager.h"
+
 int g_saveSlot = 1;
 
 #if defined(HAVE_X11) && HAVE_X11
@@ -443,7 +446,9 @@ CFrame::CFrame(wxFrame* parent,
 	for (int i = 0; i < 8; ++i)
 		g_TASInputDlg[i] = new TASInputDlg(this);
 
-	Movie::SetGCInputManip(GCTASManipFunction);
+	g_PadsManager = new GcnPadsManager();
+
+	Movie::SetGCInputManip(GCPadManagedManipFunction);
 	Movie::SetWiiInputManip(WiiTASManipFunction);
 
 	State::SetOnAfterLoadCallback(OnAfterLoadCallback);
@@ -1611,6 +1616,14 @@ void CFrame::HandleFrameSkipHotkeys()
 		frameStepCount = 0;
 		holdFrameStep = false;
 		holdFrameStepDelayCount = 0;
+	}
+}
+
+void GCPadManagedManipFunction(GCPadStatus * PadStatus, int controllerID)
+{
+	if (main_frame)
+	{
+		main_frame->g_PadsManager->pads[controllerID]->PadManipFunction(PadStatus, controllerID);
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "Core/HW/SI_DeviceGCController.h"
 #include "Core/HW/SystemTimers.h"
 #include "InputCommon/GCPadStatus.h"
+#include "Core/Movie.h"
 
 // --- standard GameCube controller ---
 CSIDevice_GCController::CSIDevice_GCController(SIDevices device, int _iDeviceNumber)
@@ -162,6 +163,8 @@ bool CSIDevice_GCController::GetData(u32& _Hi, u32& _Low)
 	if (HandleButtonCombos(PadStatus) == COMBO_ORIGIN)
 		PadStatus.button |= PAD_GET_ORIGIN;
 
+	int cid = ISIDevice::m_iDeviceNumber;
+	Movie::CallGCInputManip(&PadStatus, cid);
 	_Hi = MapPadStatus(PadStatus);
 
 	// Low bits are packed differently per mode

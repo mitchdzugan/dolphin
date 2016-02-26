@@ -50,6 +50,9 @@
     </ResourceCompile>
     <ClCompile />
     <ClCompile />
+    <ClCompile>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</TreatWarningAsError>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDolphin.cpp" />
@@ -85,6 +88,9 @@
     <ClCompile Include="Debugger\RegisterWindow.cpp" />
     <ClCompile Include="Debugger\WatchView.cpp" />
     <ClCompile Include="Debugger\WatchWindow.cpp" />
+    <ClCompile Include="ExternalActions.cpp" />
+    <ClCompile Include="GcnPadManager.cpp" />
+    <ClCompile Include="GcnPadsManager.cpp" />
     <ClCompile Include="NetPlay\ChangeGameDialog.cpp" />
     <ClCompile Include="NetPlay\NetPlaySetupFrame.cpp" />
     <ClCompile Include="NetPlay\NetWindow.cpp" />
@@ -105,6 +111,7 @@
     </ClCompile>
     <ClCompile Include="MemcardManager.cpp" />
     <ClCompile Include="NetPlay\PadMapDialog.cpp" />
+    <ClCompile Include="PadsCommon.cpp" />
     <ClCompile Include="PatchAddEdit.cpp" />
     <ClCompile Include="SoftwareVideoConfigDialog.cpp" />
     <ClCompile Include="TASInputDlg.cpp" />
@@ -123,9 +130,13 @@
     <ClInclude Include="Config\InterfaceConfigPane.h" />
     <ClInclude Include="Config\PathConfigPane.h" />
     <ClInclude Include="Config\WiiConfigPane.h" />
+    <ClInclude Include="ExternalActions.h" />
+    <ClInclude Include="GcnPadManager.h" />
+    <ClInclude Include="GcnPadsManager.h" />
     <ClInclude Include="NetPlay\ChangeGameDialog.h" />
     <ClInclude Include="NetPlay\NetPlaySetupFrame.h" />
     <ClInclude Include="NetPlay\PadMapDialog.h" />
+    <ClInclude Include="PadsCommon.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="AboutDolphin.h" />
     <ClInclude Include="ARCodeAddEdit.h" />

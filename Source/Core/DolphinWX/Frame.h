@@ -19,6 +19,7 @@
 #include "Core/HW/WiimoteEmu/WiimoteEmu.h"
 #include "DolphinWX/Globals.h"
 #include "InputCommon/GCPadStatus.h"
+#include "GcnPadsManager.h"
 
 #if defined(HAVE_X11) && HAVE_X11
 #include "DolphinWX/X11Utils.h"
@@ -92,6 +93,7 @@ public:
 	NetPlaySetupFrame* g_NetPlaySetupDiag;
 	wxCheatsWindow* g_CheatsWindow;
 	TASInputDlg* g_TASInputDlg[8];
+	GcnPadsManager* g_PadsManager;
 
 	void InitBitmaps();
 	void DoPause();
@@ -354,5 +356,6 @@ void OnStoppedCallback();
 
 // For TASInputDlg
 void GCTASManipFunction(GCPadStatus* PadStatus, int controllerID);
+void GCPadManagedManipFunction(GCPadStatus *PadStatus, int controllerID);
 void WiiTASManipFunction(u8* data, WiimoteEmu::ReportFeatures rptf, int controllerID, int ext, const wiimote_key key);
 extern int g_saveSlot;

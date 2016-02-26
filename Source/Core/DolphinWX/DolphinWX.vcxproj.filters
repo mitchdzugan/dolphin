@@ -199,6 +199,18 @@
     <ClCompile Include="NetPlay\PadMapDialog.cpp">
       <Filter>GUI\NetPlay</Filter>
     </ClCompile>
+    <ClCompile Include="GcnPadsManager.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GcnPadManager.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="PadsCommon.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ExternalActions.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -362,6 +374,18 @@
     </ClInclude>
     <ClInclude Include="NetPlay\PadMapDialog.h">
       <Filter>GUI\NetPlay</Filter>
+    </ClInclude>
+    <ClInclude Include="GcnPadsManager.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="PadsCommon.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GcnPadManager.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ExternalActions.h">
+      <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
