@@ -6,9 +6,9 @@
 #include <thread>
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 #define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
 
 GcnPadsManager::GcnPadsManager()
 {
@@ -57,9 +57,59 @@ void GcnPadsManager::PadManipFunction(GCPadStatus * PadStatus, int controllerId)
 	this->mutexExternalActions.unlock();
 }
 
+void processJson(GcnPadsManager * padsManager, const char * json)
+{
+	Json::Value actions;
+	Json::Reader reader;
+	if (reader.parse(json, actions, false))
+	{
+		if (actions["PadManipActions"].isArray())
+		{
+			for (int i=0; i<actions["PadManipActions"].size(); i++)
+			{
+				if (actions["PadManipActions"][i].isObject())
+				{
+					GCPadStatus * padStatus = new GCPadStatus();
+					padStatus->button = actions["PadManipActions"][i].get("button", 0).asInt();
+					padStatus->stickX = actions["PadManipActions"][i].get("stickX", 128).asInt();
+					padStatus->stickY = actions["PadManipActions"][i].get("stickY", 128).asInt();
+					padStatus->substickX = actions["PadManipActions"][i].get("substickX", 128).asInt();
+					padStatus->substickY = actions["PadManipActions"][i].get("substickY", 128).asInt();
+					padStatus->triggerLeft = actions["PadManipActions"][i].get("triggerLeft", 0).asInt();
+					padStatus->triggerRight = actions["PadManipActions"][i].get("triggerRight", 0).asInt();
+					padStatus->analogA = actions["PadManipActions"][i].get("analogA", 0).asInt();
+					padStatus->analogB = actions["PadManipActions"][i].get("analogB", 0).asInt();
+
+					padsManager->mutexExternalActions.lock();
+					padsManager->externalActions.push_back(new AlterPadStatus(
+						padStatus,
+						actions["PadManipActions"][i].get("frame", -1).asInt(),
+						actions["PadManipActions"][i].get("controller", -1).asInt()
+						));
+					padsManager->mutexExternalActions.unlock();
+				}
+			}
+		}
+		if (actions["TakeScreenshotActions"].isArray())
+		{
+			for (int i=0; i<actions["TakeScreenshotActions"].size(); i++)
+			{
+				if (actions["TakeScreenshotActions"][i].isObject())
+				{
+					padsManager->mutexExternalActions.lock();
+					padsManager->externalActions.push_back(new TakeScreenshot(
+						actions["TakeScreenshotActions"][i].get("frame", -1).asInt(),
+						actions["TakeScreenshotActions"][i].get("filename", "/tmp/dpio.png").asString()
+						));
+					padsManager->mutexExternalActions.unlock();
+				}
+			}
+		}
+	}
+}
+
 void clientManager(GcnPadsManager * padsManager, TcpClient * client)
 {
-
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
 
@@ -69,16 +119,15 @@ void clientManager(GcnPadsManager * padsManager, TcpClient * client)
 	std::string recvstrPostAt;
 	bool receivingJson = false;
 	int atPos = 0;
+	int readsize = 0;
 
 	// Receive until the peer shuts down the connection
 	do {
 
 		memset(recvbuf, 0, DEFAULT_BUFLEN);
-		client->read(recvbuf, recvbuflen);
+		readsize = client->read(recvbuf, recvbuflen);
 
-		int iResult = 1;
-
-		if (iResult > 0)
+		if (readsize > 0)
 		{
 			recvstr = std::string(recvbuf);
 			while (recvstr.size() > 0)
@@ -98,14 +147,15 @@ void clientManager(GcnPadsManager * padsManager, TcpClient * client)
 				}
 				else 
 				{
-					recvstrPreAt = recvstr.substr(0, atPos - 1);
+					recvstrPreAt = recvstr.substr(0, atPos);
 					recvstrPostAt = recvstr.substr(atPos + 1, recvstr.size() - atPos - 1);
 					recvstr = recvstrPostAt;
 					if (receivingJson)
 					{
 						nextJson += recvstrPreAt;
 						receivingJson = false;
-						/* processJson(nextJson); */ 
+						processJson(padsManager, nextJson.c_str());
+						nextJson = std::string("");
 					}
 					else
 					{
@@ -114,5 +164,5 @@ void clientManager(GcnPadsManager * padsManager, TcpClient * client)
 				}
 			}
 		}
-	} while (1);
+	} while (readsize > 0);
 }

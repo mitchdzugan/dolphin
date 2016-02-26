@@ -226,14 +226,14 @@ public:
 		this->fd = fd;
 	};
 
-	void read(char * recvbuf, int recvlen)
+	int read(char * recvbuf, int recvlen)
 	{
-		recv(this->fd, recvbuf, recvlen, 0);
+		return recv(this->fd, recvbuf, recvlen, 0);
 	};
 
-	void write(const char * recvbuf, int recvlen)
+	int write(const char * recvbuf, int recvlen)
 	{
-		send(this->fd, recvbuf, recvlen, 0);
+		return send(this->fd, recvbuf, recvlen, 0);
 	};
 
 private:
